@@ -1,5 +1,9 @@
 # Biodiversity in National Parks
 
+Source: https://irma.nps.gov/NPSpecies
+Secondary Source: https://www.kaggle.com/nationalparkservice/park-biodiversity
+Users interested in getting this data via web services, please go to: http://irmaservices.nps.gov
+
 # Context
 The National Park Service publishes a database of animal and plant species identified in individual national parks and verified by evidence — observations, vouchers, or reports that document the presence of a species in a park. All park species records are available to the public on the National Park Species portal; exceptions are made for sensitive, threatened, or endangered species when widespread distribution of information could pose a risk to the species in the park.
 
@@ -10,7 +14,3 @@ Each park species record includes a species ID, park name, taxonomic information
 
 Acknowledgements
 The National Park Service species list database is managed and updated by staff at individual national parks and the systemwide Inventory and Monitoring department.
-
-Source: https://irma.nps.gov/NPSpecies
-
-Users interested in getting this data via web services, please go to: http://irmaservices.nps.gov
