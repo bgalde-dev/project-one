@@ -4,6 +4,8 @@ Source: https://irma.nps.gov/NPSpecies
 
 Secondary Source: https://www.kaggle.com/nationalparkservice/park-biodiversity
 
+Crime Rate Source: https://www.kaggle.com/kingburrito666/los-angeles-crime
+
 Users interested in getting this data via web services, please go to: http://irmaservices.nps.gov
 
 # Context
