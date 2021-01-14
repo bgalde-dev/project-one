@@ -130,3 +130,6 @@ dmypy.json
 
 # API KEYS
 src/api_keys.py
+
+# VS Code
+.vscode/
