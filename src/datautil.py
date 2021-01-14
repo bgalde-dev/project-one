@@ -33,9 +33,11 @@ def reload_data():
     load_data_files()
 
 # Cleans the data. Renames to columns to be better understood, replaces main
-# crimes with more reader friendly desciptions.
+# crimes with more reader friendly desciptions. Also adds the Time block the 
+# crimes were reported.
 def clean_data():
     global clean_crime_data_df
+    global time_blocks
     load_data_files()
     # Renaming most columns so they are better understood.
     renamed_crime_df = raw_crime_data_df.rename(columns={"Date.Rptd":"Date Reported",
@@ -69,6 +71,16 @@ def clean_data():
         year_occurred.append(year[2])
         
     clean_crime_data_df['Year of Crime'] = year_occurred
+
+    clean_crime_data_df[['Time Occurred', 'Year of Crime']].apply(pd.to_numeric)
+    # Create the bins for the 4 hour time blocks
+    bins = [0, 400, 800, 1200, 1600, 2000, 2400]
+
+    # Create the labels for the time blocks
+    time_blocks = ["0000-0359", "0400-0959", "080-1159", "1200-1559", "1600-1959", "2000-2359"]
+
+    # Place the data series into a new column inside of the DataFrame
+    clean_crime_data_df["Time Block"] = pd.cut(clean_crime_data_df["Time Occurred"], bins, labels=time_blocks) 
 
 # Grabbing Total Homeless Count in LA County.  Removed commas from count data.
 def homeless_counts():
