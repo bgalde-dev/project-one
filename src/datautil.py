@@ -70,8 +70,8 @@ def clean_data():
         
     clean_crime_data_df['Year of Crime'] = year_occurred
 
-# Grabbing Total Homeless Count.  Removed commas from count data.
-def homeless_count():
+# Grabbing Total Homeless Count in LA County.  Removed commas from count data.
+def homeless_counts():
     homeless_counts = raw_homeless_data_df.loc[((raw_homeless_data_df['Measures'] == "Total Homeless") &
                                         (raw_homeless_data_df['CoC Name'] == "Los Angeles City & County CoC") & 
                                         (raw_homeless_data_df['State'] == 'CA')) 
