@@ -2,6 +2,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
+import holidays
 import warnings
 
 warnings.filterwarnings('ignore')
@@ -58,7 +59,8 @@ def clean_data(latlng_decimal=4):
                                                  "Crm.Cd":"Crime Code",
                                                  "CrmCd.Desc":"Crime Description",
                                                  "Status.Desc":"Status Description"})
-
+    # Change the date values to datetime object
+    renamed_crime_df[["Date Reported", "Date Occurred"]] = renamed_crime_df[["Date Reported", "Date Occurred"]].apply(pd.to_datetime)
     # Replacing the all capital crime description with less captials for the four crime types being investigated.
     data_replace = renamed_crime_df.replace({'ASSAULT WITH DEADLY WEAPON':'ADW',
                                          'BATTERY':'Battery',
@@ -74,12 +76,37 @@ def clean_data(latlng_decimal=4):
     # Looping through the Date Occurred splitting the date into its three components and grabbing the year to
     # put into a list to make a new column for grouping.
     year_occurred = []
-
+    month_occurred = []
+    day_occurred = []
+    dayofweek_occured = []
+    
+    holiday_bool = []
+    ca_holidays = holidays.US(state="CA")    # CA holidays
     for crime in clean_crime_data_df['Date Occurred']:
-        year = crime.split('/')
-        year_occurred.append(year[2])
+        year = crime.year
+        month = crime.month
+        day = crime.day
+        dayname = crime
+        dayofweek = crime.weekday()
+        
+        # Check for holiday
+        isholiday = crime in ca_holidays or \
+                    crime.day_name() == "Sunday" or \
+                    crime.day_name() == "Saturday"
+        
+        year_occurred.append(year)
+        month_occurred.append(month)
+        day_occurred.append(day)
+        dayofweek_occured.append(dayofweek)
+        holiday_bool.append(isholiday)
         
     clean_crime_data_df['Year of Crime'] = year_occurred
+    clean_crime_data_df['Month of Year'] = month_occurred
+    clean_crime_data_df['Day of Month'] = day_occurred
+    clean_crime_data_df['Day of Week'] = dayofweek_occured
+    
+    clean_crime_data_df["Holiday"] = holiday_bool
+
 
     # apply function returns a dataframe
     clean_crime_data_df[['Time Occurred', 'Year of Crime']] = clean_crime_data_df[['Time Occurred', 'Year of Crime']].apply(pd.to_numeric)
