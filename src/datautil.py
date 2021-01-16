@@ -35,12 +35,21 @@ def reload_data():
 # Cleans the data. Renames to columns to be better understood, replaces main
 # crimes with more reader friendly desciptions. Also adds the Time block the 
 # crimes were reported.
-def clean_data():
+def clean_data(latlng_decimal=4):
     global clean_crime_data_df
+    global nan_dropped_crime_df
     global time_blocks
     load_data_files()
+    
+    # Remove the nan values from the data (Nan values in Crime desc, Lat and Lng)
+    nan_dropped_crime_df = raw_crime_data_df.dropna()
+    # Convert the longitude and latitude to numeric
+    nan_dropped_crime_df[["Longitude", "Latitude"]] = nan_dropped_crime_df[["Longitude", "Latitude"]].apply(pd.to_numeric)
+    # Round to nearest two decimals for the lat and lng 
+    nan_dropped_crime_df = nan_dropped_crime_df.round({"Latitude": latlng_decimal, "Longitude": latlng_decimal})
+    
     # Renaming most columns so they are better understood.
-    renamed_crime_df = raw_crime_data_df.rename(columns={"Date.Rptd":"Date Reported",
+    renamed_crime_df = nan_dropped_crime_df.rename(columns={"Date.Rptd":"Date Reported",
                                                  "DR.NO":"Case Number",
                                                  "DATE.OCC":"Date Occurred",
                                                  "TIME.OCC":"Time Occurred",
@@ -72,7 +81,8 @@ def clean_data():
         
     clean_crime_data_df['Year of Crime'] = year_occurred
 
-    clean_crime_data_df[['Time Occurred', 'Year of Crime']].apply(pd.to_numeric)
+    # apply function returns a dataframe
+    clean_crime_data_df[['Time Occurred', 'Year of Crime']] = clean_crime_data_df[['Time Occurred', 'Year of Crime']].apply(pd.to_numeric)
     # Create the bins for the 4 hour time blocks
     bins = [0, 400, 800, 1200, 1600, 2000, 2400]
 
@@ -96,4 +106,24 @@ def homeless_counts():
     return homeless_counts_fixed
 
 
+def collect_lat_lng(crime_desc):
+    # Closeby lat and lng
+    if crime_desc == "All":
+        df = nan_dropped_crime_df
+    else:
+        df = nan_dropped_crime_df[nan_dropped_crime_df["CrmCd.Desc"] == crime_desc]
+        
+    lat_lng_df = df[["Latitude", "Longitude"]].drop_duplicates()
 
+    weights = []
+    counter = 0   # for printing
+    for lat_lng in lat_lng_df.iterrows():
+        if counter%100 == 0:
+            print("%d/%d" % (counter, len(lat_lng_df)), end='    \r', flush=True)
+        weight = np.bitwise_and(np.isclose(df["Latitude"], lat_lng[1]["Latitude"]),
+                   np.isclose(df["Longitude"], lat_lng[1]["Longitude"])).sum()
+        weights.append(weight)
+        counter = counter+1
+    
+    lat_lng_df["Weights"] = weights/np.array(weights).max()
+    return lat_lng_df
