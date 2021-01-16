@@ -106,12 +106,12 @@ def homeless_counts():
     return homeless_counts_fixed
 
 
-def collect_lat_lng(crime_desc):
+def collect_lat_lng_dist(crime_desc):
     # Closeby lat and lng
     if crime_desc == "All":
-        df = nan_dropped_crime_df
+        df = clean_crime_data_df
     else:
-        df = nan_dropped_crime_df[nan_dropped_crime_df["CrmCd.Desc"] == crime_desc]
+        df = clean_crime_data_df[clean_crime_data_df["Crime Description"] == crime_desc]
         
     lat_lng_df = df[["Latitude", "Longitude"]].drop_duplicates()
 
