@@ -69,25 +69,34 @@ def clean_data():
     year_occurred = []
     month_occurred = []
     day_occurred = []
-
+    dayofweek_occured = []
+    
+    holiday_bool = []
+    ca_holidays = holidays.US(state="CA")    # CA holidays
     for crime in clean_crime_data_df['Date Occurred']:
         year = crime.year
         month = crime.month
         day = crime.day
+        dayname = crime
+        dayofweek = crime.weekday()
+        
+        # Check for holiday
+        isholiday = crime in ca_holidays or \
+                    crime.day_name() == "Sunday" or \
+                    crime.day_name() == "Saturday"
         
         year_occurred.append(year)
         month_occurred.append(month)
         day_occurred.append(day)
+        dayofweek_occured.append(dayofweek)
+        holiday_bool.append(isholiday)
         
     clean_crime_data_df['Year of Crime'] = year_occurred
-    clean_crime_data_df['Month of Crime'] = month_occurred
-    clean_crime_data_df['Day of Crime'] = day_occurred
+    clean_crime_data_df['Month of Year'] = month_occurred
+    clean_crime_data_df['Day of Month'] = day_occurred
+    clean_crime_data_df['Day of Week'] = dayofweek_occured
     
-    # Add holidays
-    ca_holidays = holidays.US(state="CA")
-    clean_crime_data_df["Holiday"] = clean_crime_data_df.apply(lambda row: row["Date Occurred"] in ca_holidays or \
-                                                                           row["Date Occurred"].day_name() == "Sunday" or \
-                                                                           row["Date Occurred"].day_name() == "Saturday", axis=1)
+    clean_crime_data_df["Holiday"] = holiday_bool
 
 
     clean_crime_data_df[['Time Occurred', 'Year of Crime']].apply(pd.to_numeric)
