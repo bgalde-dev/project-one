@@ -13,6 +13,7 @@ homeless_data_csv = "../data/crime/2007-2016-Homelessness-USA.csv"
 raw_crime_data_df = pd.DataFrame()
 raw_homeless_data_df = pd.DataFrame()
 clean_crime_data_df = pd.DataFrame()
+time_blocks = []
 
 # Loads the crime and homeless data files to raw dataframes
 def load_data_files():
@@ -27,11 +28,11 @@ def load_data_files():
     else:
         print(f'DATA FILES ALREADY LOADED ... To reload data use reload_data()')
 
-# Reloads the data files if data changes
+# Reloads and cleans the data files if data changes
 def reload_data():
     global loaded
     loaded = False
-    load_data_files()
+    clean_data()
 
 # Cleans the data. Renames to columns to be better understood, replaces main
 # crimes with more reader friendly desciptions. Also adds the Time block the 
@@ -107,17 +108,8 @@ def clean_data(latlng_decimal=4):
     
     clean_crime_data_df["Holiday"] = holiday_bool
 
-
-    # apply function returns a dataframe
-    clean_crime_data_df[['Time Occurred', 'Year of Crime']] = clean_crime_data_df[['Time Occurred', 'Year of Crime']].apply(pd.to_numeric)
-    # Create the bins for the 4 hour time blocks
-    bins = [0, 400, 800, 1200, 1600, 2000, 2400]
-
-    # Create the labels for the time blocks
-    time_blocks = ["0000-0359", "0400-0959", "080-1159", "1200-1559", "1600-1959", "2000-2359"]
-
-    # Place the data series into a new column inside of the DataFrame
-    clean_crime_data_df["Time Block"] = pd.cut(clean_crime_data_df["Time Occurred"], bins, labels=time_blocks) 
+    # Create 1 hour time blocks column. Times are rounded down to the nearest hour
+    clean_crime_data_df["Time Block Occurred"] = (clean_crime_data_df["Time Occurred"] / 100).astype(int) *100
 
 # Grabbing Total Homeless Count in LA County.  Removed commas from count data.
 def homeless_counts():
